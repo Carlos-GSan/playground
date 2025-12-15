@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Book, Review
 from django.db.models import Q
 from django.core.paginator import Paginator 
-from .forms import ReviewSimpleForm
+from .forms import ReviewSimpleForm, ReviewForm
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 
@@ -41,21 +41,14 @@ def index(request):
     
 def add_review(request, book_id):
     book = get_object_or_404(Book, id=book_id)
-    form = ReviewSimpleForm(request.POST or None)
+    form = ReviewForm(request.POST or None)
     
     if request.method == "POST":
         if form.is_valid():
-            rating = form.cleaned_data["rating"]
-            text = form.cleaned_data["text"]
-            user = request.user if request.user.is_authenticated else User.objects.first()
-        
-            Review.objects.create(
-                user = user,
-                book=book,
-                rating = rating,
-                text=text
-            )
-            
+            review = form.save(commit=False) # commit=false, para el guardado de forma automática
+            review.book = book # dato faltante
+            review.user = request.user # dato faltante
+            review.save() # ahora si guardamos
             messages.success(request, "Gracias por la reseña")
             return redirect("recommend_book", book_id=book.id)
         else:
