@@ -53,6 +53,6 @@ class RequireLoginMiddleware:
         
         if not request.user.is_authenticated and not any(request.path.startswith(url) for url in EXCEPT_URLS):
             print("Usuario no autenticado, redirigiendo...")
-            return redirect('/admin/')
+            return redirect('/login/')
         
         return self.get_response(request)

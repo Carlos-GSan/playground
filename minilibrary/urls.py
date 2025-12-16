@@ -13,5 +13,6 @@ urlpatterns = [
     path('review/<int:pk>/edit/', views.ReviewUpdateView.as_view(), name="edit_review"),
     path('review/<int:pk>/delete/', views.ReviewDeleteView.as_view(), name="delete_review"), # este para eliminar
     path('time_test', views.time_test), 
-    path('counter/', views.visit_counter), 
+    path('counter/', views.visit_counter)
+    
 ]

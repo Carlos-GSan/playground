@@ -17,10 +17,12 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.auth.views import LoginView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("messages/", include("quotes.urls")),
     path("landings/", include("landing.urls")),
-    path("minilibrary/", include("minilibrary.urls"))
+    path("minilibrary/", include("minilibrary.urls")),
+    path('login/', LoginView.as_view(template_name="registration/login.html"), name="login")
 ]
