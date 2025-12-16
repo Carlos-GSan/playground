@@ -39,6 +39,10 @@ class BookDetailView(DetailView):
     context_object_name = "book"
     # slug_field = "slug" ## en caso de que aplique con slug
     # slug_url_kwarg = "slug" 
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        request.session['last_viewed_book'] = self.object.id
+        return response
 
 class ReviewCreateView(CreateView):
     model = Review
@@ -91,6 +95,7 @@ def index(request):
         query = request.GET.get("query_search")
         date_start = request.GET.get("start")
         date_end = request.GET.get("end")
+        book_id_recommend = request.session.get('last_viewed_book')
         if query:
             books = books.filter(
                 Q(title__icontains=query) | Q(author__name__icontains=query)                
@@ -107,10 +112,19 @@ def index(request):
             query_params.pop("page")
         query_string = query_params.urlencode()
         
+        if book_id_recommend:
+            try:
+                last_book=Book.objects.get(pk=book_id_recommend)
+            except Book.DoesNotExist:
+                    last_book=None
+        else:
+            last_book=None
+        
         return render(request, "minilibrary/minilibrary.html",{
             "page_obj": page_obj,
             "query": query,
-            "query_string": query_string
+            "query_string": query_string,
+            "last_book": last_book
         })
     except Exception:
         return HttpResponseNotFound("Página no encontrada")

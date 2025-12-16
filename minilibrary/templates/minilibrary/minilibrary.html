@@ -38,5 +38,13 @@
         {% endif %}
             
     </div>
+
+    
+    {% if last_book %}
+        <p>Último libro que visitaste: <a href="{% url 'book_detail' last_book.id %}">{{last_book.title}}</a></p>
+    {% else %}
+        <p>No has visitado ningun libro</p>
+    {% endif %}
+        
 </body>
 </html>
