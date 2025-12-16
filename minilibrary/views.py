@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
+import time
 
 User = get_user_model()
 # Create your views here.
@@ -133,4 +134,6 @@ def add_review(request,book_id):
         "book":book
     })
     
- 
+def time_test(request):
+    time.sleep(2)
+    return HttpResponse("Esta vista tardo 2 segundos")
