@@ -47,7 +47,7 @@ class Review(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     book = models.ForeignKey(
         Book, on_delete=models.CASCADE, related_name="reviews")
-    rating = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     
