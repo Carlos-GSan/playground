@@ -137,3 +137,11 @@ def add_review(request,book_id):
 def time_test(request):
     time.sleep(2)
     return HttpResponse("Esta vista tardo 2 segundos")
+
+def visit_counter(request):
+    visits = request.session.get("visitas", 0)
+    visits +=1
+    request.session["visitas"] = visits
+    request.session.set_expiry(15)
+    # 300 -> 10 minutos, 0-> Al cerrar navegador, None -> duración por defecto
+    return HttpResponse(f"Has visitado esta página {visits}")
