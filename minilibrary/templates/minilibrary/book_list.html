@@ -28,9 +28,14 @@
             <a href="?page={{page_obj.next_page_number}}">Siguiente</a>
         {% endif %}
             
-    </div>
-    
+    </div>  
 {% endif %}
+
+<form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Cerrar sesión</button>
+</form>
+
     
     
 {% endblock content %}
