@@ -1,5 +1,5 @@
 from email import message
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from .models import Book, Review
@@ -11,6 +11,8 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 import time
 
 User = get_user_model()
@@ -33,16 +35,19 @@ class BookListView(ListView):
     context_object_name = "books"
     paginate_by = 5
 
-class BookDetailView(DetailView):
+class BookDetailView(LoginRequiredMixin,DetailView):
     model = Book
     template_name = "minilibrary/book_detail.html"
     context_object_name = "book"
     # slug_field = "slug" ## en caso de que aplique con slug
     # slug_url_kwarg = "slug" 
     def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        request.session['last_viewed_book'] = self.object.id
-        return response
+        if request.user.has_perm('minilibrary.view_book'):
+            response = super().get(request, *args, **kwargs)
+            request.session['last_viewed_book'] = self.object.id
+            return response
+        else:
+            return HttpResponseForbidden('Contenido no disponible')
 
 class ReviewCreateView(CreateView):
     model = Review
@@ -66,7 +71,7 @@ class ReviewUpdateView(UpdateView):
     template_name = "minilibrary/add_review.html"
     
     def get_queryset(self):
-        return Review.objects.filter(user_id=1)
+        return Review.objects.filter(user_id=self.request.user.id)
     
     def form_valid(self, form):
         messages.success(self.request, "Se actualizo tu reseña, correctamente")
@@ -78,17 +83,19 @@ class ReviewUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy("book_detail", kwargs={"pk":self.object.book.id})
 
-class ReviewDeleteView(DeleteView):
+class ReviewDeleteView(PermissionRequiredMixin,DeleteView):
+    permission_required = "minilibrary.delete_review"
     model = Review
     template_name = "minilibrary/review_confirm_delete.html"
     success_url = reverse_lazy("book_list")
     
     def get_queryset(self):
-        return Review.objects.filter(user_id=1) # prueba
+        return Review.objects.filter(user_id=self.request.user.id)
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Tu reseña fue eliminada.")
         return super().delete(request, *args, **kwargs)
 
+@login_required
 def index(request):
     try:
         books = Book.objects.all()
@@ -129,6 +136,7 @@ def index(request):
     except Exception:
         return HttpResponseNotFound("Página no encontrada")
     
+@permission_required('minilibrary.add_review')
 def add_review(request,book_id):
     book = get_object_or_404(Book, id=book_id)
     form = ReviewForm(request.POST or None)

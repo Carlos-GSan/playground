@@ -57,8 +57,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'minilibrary.middleware.TimingMiddleware',
-    'minilibrary.middleware.RequireLoginMiddleware'
+    # 'minilibrary.middleware.TimingMiddleware',
+    # 'minilibrary.middleware.RequireLoginMiddleware'
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -143,5 +143,7 @@ SESSION_COOKIE_AGE = 3600
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
 
+
+LOGIN_URL="login"
 LOGIN_REDIRECT_URL="book_list"
 LOGOUT_REDIRECT_URL="login"
